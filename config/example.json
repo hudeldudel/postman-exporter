@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "10262487-927e-49c2-a231-d77ed5e66033",
+		"name": "prometheus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "main",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "622e31a4-f70f-42e4-a8ab-56c98c790ad6",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Prometheus - Monitoring system &amp; time series database\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://prometheus.io",
+					"protocol": "https",
+					"host": [
+						"prometheus",
+						"io"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
