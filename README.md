@@ -38,9 +38,9 @@ Edit the configuration file [config/config.js](config/config.js) to fit to your 
 
 Example:
 
-```json
-module.exports = {
+```javascript
 
+module.exports = {
     // The network port to bind to
     serverPort: process.env.POSTMAN_EXPORTER_PORT || 3000,
 
