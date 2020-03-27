@@ -39,7 +39,6 @@ Edit the configuration file [config/config.js](config/config.js) to fit to your 
 Example:
 
 ```javascript
-
 module.exports = {
     // The network port to bind to
     serverPort: process.env.POSTMAN_EXPORTER_PORT || 3000,
@@ -95,7 +94,7 @@ scrape_configs:
     metrics_path: /probe
     static_configs:
     - targets:
-      - demo
+      - example
     relabel_configs:
     - source_labels: [__address__]
       target_label: probe
