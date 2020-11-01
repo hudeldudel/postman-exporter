@@ -1,15 +1,18 @@
+const config = require('../config/config');
 const newman = require('newman');
 const promClient = require('prom-client');
+const logger = require('../utils/logger');
 
 const NAME_PREFIX = 'probe_pm_';
 
 class Prober {
 
-  constructor(req, res, options) {
-    console.log(`Running prober with probe "${req.params.probe}" and args: ${JSON.stringify(req.query)}`);
+  constructor(req, res, probe) {
+    logger.debug(`Running collection for probe {${probe}} with args: ${JSON.stringify(req.query)}`);
     this.req = req;
     this.res = res;
-    this.options = options;
+    this.probe = probe;
+    this.options = config.probes[probe].options;
 
     // registry for the current probe
     this.probeRegistry = new promClient.Registry();
@@ -18,15 +21,15 @@ class Prober {
   run() {
     newman.run(this.options)
       .on('start', (err, args) => {
-        console.log('running a collection...');
+        logger.debug('running a collection...');
       })
       .on('done', (err, summary) => {
         if (err || summary.error) {
-          console.error('collection run encountered an error.');
+          logger.error(`collection run for probe '${this.probe}' encountered an error`);
           this.summary = summary;
         }
         else {
-          console.log('collection run completed.');
+          logger.info(`collection run for probe '${this.probe}' completed`);
           if (this.req.query.debug === 'true') return this.res.send(summary.run);
 
           /**
@@ -58,7 +61,7 @@ class Prober {
           // stats
           for (const [key, value] of Object.entries(summary.run.stats)) {
             for (const [key2, value2] of Object.entries(value)) {
-              console.log('stats', key, key2, value2);
+              logger.debug(`stats ${key} ${key2} ${value2}`);
               new promClient.Gauge({
                 name: `${NAME_PREFIX}stats_${key}_${key2}`,
                 help: `Returns the stats ${key} ${key2}`,
@@ -75,7 +78,7 @@ class Prober {
           }).set((summary.run.timings.completed - summary.run.timings.started) / 1000);
 
           for (const [key, value] of Object.entries(summary.run.timings)) {
-            console.log('timings', key, value);
+            logger.debug(`timings ${key} ${value}`);
             if (key === 'started') continue;
             if (key === 'completed') continue;
             new promClient.Gauge({

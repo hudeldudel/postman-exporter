@@ -1,6 +1,7 @@
 const config = require('./config/config');
 const promClient = require('prom-client');
 const express = require('express');
+const logger = require('./utils/logger');
 const Prober = require('./prober/prober');
 
 const register = new promClient.Registry();
@@ -38,9 +39,10 @@ app.get('/', (req, res) => {
  */
 app.get('/probe/:probe', (req, res) => {
   try {
-    options = config.probes[req.params.probe].options;
+    return new Prober(req, res, req.params.probe).run();
   }
   catch {
+    logger.info(`requested probe '${req.params.probe}' not found`);
     return res.status(404).send('Probe not found');
   }
   return new Prober(req, res, options).run();
@@ -71,4 +73,4 @@ app.get('/-/ready', (req, res) => {
   res.send('ready');
 });
 
-app.listen(config.serverPort, () => console.log(`postman exporter running on port ${config.serverPort}`));
+app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
