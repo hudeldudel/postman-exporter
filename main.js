@@ -13,6 +13,7 @@ const app = express();
  * Show index page
  */
 app.get('/', (req, res) => {
+  logger.debug('return /');
 
   let probes = '';
   
@@ -45,13 +46,13 @@ app.get('/probe/:probe', (req, res) => {
     logger.info(`requested probe '${req.params.probe}' not found`);
     return res.status(404).send('Probe not found');
   }
-  return new Prober(req, res, options).run();
 });
 
 /**
  * Return Node.js metrics
  */
 app.get('/metrics', (req, res) => {
+  logger.debug('return /metrics');
   res.set('Content-Type', register.contentType);
   res.end(register.metrics());
 });
@@ -61,8 +62,10 @@ app.get('/metrics', (req, res) => {
  */
 app.get('/config', (req, res) => {
   if (!config.enableConfigEndpoint === true) {
+    logger.debug('request to /config is forbidden. configuration endpoint disabled');
     return res.status(403).send('configuration endpoint disabled');
   }
+  logger.debug('return /config');
   res.send(config);
 });
 
@@ -70,6 +73,7 @@ app.get('/config', (req, res) => {
  * Returns 200 when the service is running
  */
 app.get('/-/ready', (req, res) => {
+  logger.debug('return /-/ready');
   res.send('ready');
 });
 

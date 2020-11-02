@@ -8,7 +8,6 @@ const NAME_PREFIX = 'probe_pm_';
 class Prober {
 
   constructor(req, res, probe) {
-    logger.debug(`Running collection for probe {${probe}} with args: ${JSON.stringify(req.query)}`);
     this.req = req;
     this.res = res;
     this.probe = probe;
@@ -21,7 +20,7 @@ class Prober {
   run() {
     newman.run(this.options)
       .on('start', (err, args) => {
-        logger.debug('running a collection...');
+        logger.debug(`collection run for probe '${this.probe}' started`);
       })
       .on('done', (err, summary) => {
         if (err || summary.error) {
@@ -29,8 +28,12 @@ class Prober {
           this.summary = summary;
         }
         else {
-          logger.info(`collection run for probe '${this.probe}' completed`);
-          if (this.req.query.debug === 'true') return this.res.send(summary.run);
+          logger.debug(`collection run for probe '${this.probe}' completed`);
+          if (this.req.query.debug === 'true') {
+            // ToDo: allow to disable debug output as it may contain secrets
+            logger.info(`return /probe/${this.probe} with debug=true`);
+            return this.res.send(summary.run);
+          }
 
           /**
            * set metrics
@@ -105,6 +108,7 @@ class Prober {
           // * Response time
           // loop also over assertions?
 
+          logger.info(`return /probe/${this.probe}`);
           this.res.send(this.probeRegistry.metrics());
         }
       });
