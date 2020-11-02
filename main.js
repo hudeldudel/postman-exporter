@@ -1,6 +1,7 @@
 const config = require('./config/config');
 const promClient = require('prom-client');
 const express = require('express');
+const logger = require('./utils/logger');
 const Prober = require('./prober/prober');
 
 const register = new promClient.Registry();
@@ -12,6 +13,7 @@ const app = express();
  * Show index page
  */
 app.get('/', (req, res) => {
+  logger.debug('return /');
 
   let probes = '';
   
@@ -38,18 +40,19 @@ app.get('/', (req, res) => {
  */
 app.get('/probe/:probe', (req, res) => {
   try {
-    options = config.probes[req.params.probe].options;
+    return new Prober(req, res, req.params.probe).run();
   }
   catch {
+    logger.info(`requested probe '${req.params.probe}' not found`);
     return res.status(404).send('Probe not found');
   }
-  return new Prober(req, res, options).run();
 });
 
 /**
  * Return Node.js metrics
  */
 app.get('/metrics', (req, res) => {
+  logger.debug('return /metrics');
   res.set('Content-Type', register.contentType);
   res.end(register.metrics());
 });
@@ -59,8 +62,10 @@ app.get('/metrics', (req, res) => {
  */
 app.get('/config', (req, res) => {
   if (!config.enableConfigEndpoint === true) {
+    logger.debug('request to /config is forbidden. configuration endpoint disabled');
     return res.status(403).send('configuration endpoint disabled');
   }
+  logger.debug('return /config');
   res.send(config);
 });
 
@@ -68,7 +73,8 @@ app.get('/config', (req, res) => {
  * Returns 200 when the service is running
  */
 app.get('/-/ready', (req, res) => {
+  logger.debug('return /-/ready');
   res.send('ready');
 });
 
-app.listen(config.serverPort, () => console.log(`postman exporter running on port ${config.serverPort}`));
+app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
