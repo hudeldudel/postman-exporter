@@ -43,6 +43,9 @@ module.exports = {
     // The network port to bind to
     serverPort: process.env.POSTMAN_EXPORTER_PORT || 3000,
 
+    // Set loglevel (debug|info|warn|error)
+    logLevel: process.env.POSTMAN_BLACKBOX_EXPORTER_LOGLEVEL || 'info',
+
     // Enable the /config endpoint. 
     // false if omitted
     // Warning: the configuration may contain secrets included in 
