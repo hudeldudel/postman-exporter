@@ -40,19 +40,11 @@ class Prober {
            */
 
           // probe success
-          if (summary.run.failures.length) {
-            new promClient.Gauge({
-              name: NAME_PREFIX + 'success',
-              help: 'Returns the probe success',
-              registers: [this.probeRegistry]
-            }).set(0);
-          } else {
-            new promClient.Gauge({
-              name: NAME_PREFIX + 'success',
-              help: 'Returns the probe success',
-              registers: [this.probeRegistry]
-            }).set(1);
-          }
+          new promClient.Gauge({
+            name: NAME_PREFIX + 'success',
+            help: 'Returns the probe success',
+            registers: [this.probeRegistry]
+          }).set(summary.run.failures.length ? 0 : 1);
 
           // transfers
           new promClient.Gauge({
@@ -91,13 +83,26 @@ class Prober {
             }).set(value / 1000);
           }
 
-          // failures
-          new promClient.Gauge({
-            name: NAME_PREFIX + 'failures_total',
-            help: 'Returns the total failure count',
-            registers: [this.probeRegistry]
-          }).set(summary.run.failures.length);
-          
+          // executions
+          var assertionFailureGauge = new promClient.Gauge({
+            name: NAME_PREFIX + 'assertion_failure',
+            help: 'Returns the assertion success',
+            registers: [this.probeRegistry],
+            labelNames: ['iteration', 'position', 'request_name', 'assertion']
+          });
+          for (const [key, execution] of Object.entries(summary.run.executions)) {
+            for (const [key2, assertion] of Object.entries(execution.assertions)) {
+              assertionFailureGauge.set(
+                {
+                  'iteration': execution.cursor.iteration,
+                  'position': execution.cursor.position,
+                  'request_name': execution.item.name,
+                  'assertion': assertion.assertion
+                }, 
+                assertion.error !== undefined ? 1 : 0
+              );
+            }
+          }
           // ToDo:
           // loop over sumary.run.executions and add with labels?
           // * Request name
@@ -106,7 +111,13 @@ class Prober {
           // * Response code
           // * Response data received
           // * Response time
-          // loop also over assertions?
+
+          // failures
+          new promClient.Gauge({
+            name: NAME_PREFIX + 'failures_total',
+            help: 'Returns the total failure count',
+            registers: [this.probeRegistry]
+          }).set(summary.run.failures.length);
 
           logger.info(`return /probe/${this.probe}`);
           this.res.send(this.probeRegistry.metrics());
