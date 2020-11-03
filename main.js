@@ -62,16 +62,12 @@ app.get('/metrics', (req, res) => {
  * Return current configuration
  */
 app.get('/config', (req, res) => {
-  if (!config.enableConfigEndpoint === true) {
-    logger.debug('request to /config is forbidden. configuration endpoint disabled');
-    return res.status(403).send('configuration endpoint disabled');
-  }
   logger.debug('return /config');
   res.send(config);
 });
 
 /**
- * Returns 200 when the service is running
+ * Returns status code 200 when the service is running
  */
 app.get('/-/ready', (req, res) => {
   logger.debug('return /-/ready');
