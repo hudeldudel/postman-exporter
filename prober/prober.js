@@ -31,9 +31,13 @@ class Prober {
         else {
           logger.debug(`collection run for probe '${this.probe}' completed`);
           if (this.req.query.debug === 'true') {
-            // ToDo: allow to disable debug output as it may contain secrets
-            logger.info(`return /probe/${this.probe} with debug=true`);
-            return this.res.send(summary.run);
+            if (config.enableProbeDebugging) {
+              logger.info(`return /probe/${this.probe} with debug=true`);
+              return this.res.send(summary.run);
+            } else {
+              logger.info(`rejected request to /probe/${this.probe} with debug=true. Probe debugging is disabled`);
+              return this.res.status(403).send('probe debugging disabled');
+            }
           }
 
           /**

@@ -20,8 +20,7 @@ app.get('/', (req, res) => {
   
   Object.keys(probeConfig).forEach(probe => {
     probes += `
-      <p><a href="probe/${probe}">Probe "${probe}"</a></p>
-      <p><a href="probe/${probe}?debug=true">Debug probe "${probe}"</a></p>`;
+      <li><a href="probe/${probe}">${probe}</a></li>`;
   });
 
   res.send(`<html>
@@ -31,7 +30,9 @@ app.get('/', (req, res) => {
     <p><a href="metrics">Metrics</a></p>
     <p><a href="config">Configuration</a></p>
     <h2>Probes</h2>
+    <ul>
     ${probes}
+    </ul>
   </body>
 </html>`);
 });
