@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const probeConfig = require(config.probeConfigFile);
 const newman = require('newman');
 const promClient = require('prom-client');
 const logger = require('../utils/logger');
@@ -11,7 +12,7 @@ class Prober {
     this.req = req;
     this.res = res;
     this.probe = probe;
-    this.options = config.probes[probe].options;
+    this.options = probeConfig[probe].options;
 
     // registry for the current probe
     this.probeRegistry = new promClient.Registry();

@@ -1,4 +1,5 @@
 const config = require('./config/config');
+const probeConfig = require(config.probeConfigFile);
 const promClient = require('prom-client');
 const express = require('express');
 const logger = require('./utils/logger');
@@ -17,7 +18,7 @@ app.get('/', (req, res) => {
 
   let probes = '';
   
-  Object.keys(config.probes).forEach(probe => {
+  Object.keys(probeConfig).forEach(probe => {
     probes += `
       <p><a href="probe/${probe}">Probe "${probe}"</a></p>
       <p><a href="probe/${probe}?debug=true">Debug probe "${probe}"</a></p>`;
