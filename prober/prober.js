@@ -91,7 +91,7 @@ class Prober {
           // executions
           var assertionFailureGauge = new promClient.Gauge({
             name: NAME_PREFIX + 'assertion_failure',
-            help: 'Returns the assertion success',
+            help: 'Returns assertion failures',
             registers: [this.probeRegistry],
             labelNames: ['iteration', 'position', 'request_name', 'assertion']
           });

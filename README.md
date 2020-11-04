@@ -142,11 +142,12 @@ Returns status code 200 when the service is running
 
 ## Metrics
 
-* probe success
+* probe_pm_success: overall probe success (no failures for collection run)
 * Values from https://github.com/postmanlabs/newman#newmanruncallbackerror-object--summary-object
   * summary.run.transfers.responseTotal
   * summary.run.stats.*
   * summary.run.timings.*
+  * probe_pm_assertion_failure: assertion failures with iteration, position, request_name, assertion labels
   * Number of summary.run.failures
 
 ## Example Grafana Dashboard
