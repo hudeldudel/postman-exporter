@@ -12,17 +12,16 @@ The postman exporter aims to be able to carry even complex test procedures. Thes
 
 Prerequisites:
 
-* [Node.js](https://nodejs.org/)  
-  tested with v10.18.1
+* [Node.js](https://nodejs.org/) >= v10
 
 Install: 
 
-* Checkout the project
-* Run `npm i` to install required dependencies
+* GIT clone the project or [download the latest release](https://github.com/hudeldudel/postman-exporter/releases)
+* Run `npm i` in the project folder to install required dependencies
 
 Run: 
 
-* Run `npm start` to start the service.  
+* Run `npm start` in the project folder to start the service.  
 By default it will listen on port 3000.
 
 ## Configuration
@@ -34,53 +33,64 @@ The configuration consists of two parts.
 
 ### Postman Exporter Configuration
 
-Edit the configuration file [config/config.js](config/config.js) to fit to your needs.
+**Probe configuration**
+
+Edit the configuration file [config/probes.js](config/probes.js) to fit to your needs.
+
+A Postman collection and associated options are combined to form a *probe*. Several probes can be configured to make them available via the `/probes` endpoint.
+
+See also *[newman run options](https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter)* for details on the options available.
 
 Example:
 
 ```javascript
 module.exports = {
-    // The network port to bind to
-    serverPort: process.env.POSTMAN_EXPORTER_PORT || 3000,
+  // Each probe requires a Postman collection and allows for additional options. 
+  // Execute by requesting /probe/<probe_name>
 
-    // Set loglevel (debug|info|warn|error)
-    logLevel: process.env.POSTMAN_BLACKBOX_EXPORTER_LOGLEVEL || 'info',
+  // Probe name
+  // <probe_name>
+  // String of non-registered URL characters (A–Z, a–z, 0-9, -._~)
+  "example": {
 
-    // Enable the /config endpoint. 
-    // false if omitted
-    // Warning: the configuration may contain secrets included in 
-    //  collections, environments, etc. 
-    enableConfigEndpoint: true,
+      // see newman documentation for all available parameters
+      // https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter
+      options: {
+          collection: require('./example.json')
+      }
+  },
 
-    // A probe requires a Postman collection and allows for additional options. 
-    // Execute by requesting /probe/<probe_name>
-    probes: {
-
-        // Probe name
-        // <probe_name>
-        // String of non-registered URL characters (A–Z, a–z, 0-9, -._~)
-        "example": {
-
-            // see newman documentation for all available parameters
-            // https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter
-            options: {
-                collection: require('./example.json')
-            }
-        },
-
-        "example2": {
-            options: {
-                collection: require('./eample2-collection.json'),
-                environment: require('./example2-environment.json'),
-                sslClientCert: __dirname + '/' + 'cert.pem',
-                sslClientKey: __dirname + '/' + 'key.pem',
-                timeoutRequest: 2000,
-                folder: 'myFolder'
-            }
-        }
-    }
+  "example2": {
+      options: {
+          collection: require('./eample2-collection.json'),
+          environment: require('./example2-environment.json'),
+          sslClientCert: __dirname + '/' + 'cert.pem',
+          sslClientKey: __dirname + '/' + 'key.pem',
+          timeoutRequest: 2000,
+          folder: 'myFolder'
+      }
+  }
 };
 ```
+
+
+**Service configuration**
+
+Service configuration is available via configuration file [config/config.js](config/config.js) or environment variables:
+
+* `POSTMAN_BLACKBOX_EXPORTER_PORT`\
+Network port to bind to.\
+Default: *3000*
+* `POSTMAN_BLACKBOX_EXPORTER_LOGLEVEL`\
+Loglevel (*debug*|*info*|*warn*|*error*).\
+Default: *info*
+* `POSTMAN_BLACKBOX_EXPORTER_PROBE_CONFIG_FILE`\
+Path to probe configuration file.\
+Default: *config/probes.js*
+* `POSTMAN_BLACKBOX_EXPORTER_PROBE_DEBUG`\
+Allow/disallow (*true*|*false*) probe debug mode.\
+**!** Debug output may expose secrets contained in requests/responses, etc.. **!**\
+Default: *false*
 
 ### Prometheus Configuration
 
@@ -110,22 +120,24 @@ scrape_configs:
 
 ## Endpoints
 
-`GET /`
+* `GET /`\
 Display overview page
 
-`GET /probe/:probe`
-Run probe and show metrics
-Parameters:
-`probe`: the probe to run. E. g. /probe/example
+* `GET /probe/:probe[?debug=true]`\
+Run probe and show metrics\
+*Parameters*:\
+`probe`: (required) the probe to run. E. g. /probe/example\
+*Arguments*:\
+`?debug=true`: (optional) If added, newmans [run summary object](https://github.com/postmanlabs/newman#newmanruncallbackerror-object--summary-object) is returned instead of metrics. Probe debug also needs to be enabled in configuration.
 
-`GET /config`
+* `GET /config`\
 Show active configuration
 
-`GET /metrics`
+* `GET /metrics`\
 Node.js server metrics
 
-`GET /-/ready`
-Returns 200 when the service is running
+* `GET /-/ready`\
+Returns status code 200 when the service is running
 
 
 ## Metrics
