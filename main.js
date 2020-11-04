@@ -1,6 +1,8 @@
 const config = require('./config/config');
+const probeConfig = require(config.probeConfigFile);
 const promClient = require('prom-client');
 const express = require('express');
+const logger = require('./utils/logger');
 const Prober = require('./prober/prober');
 
 const register = new promClient.Registry();
@@ -12,13 +14,13 @@ const app = express();
  * Show index page
  */
 app.get('/', (req, res) => {
+  logger.debug('return /');
 
   let probes = '';
   
-  Object.keys(config.probes).forEach(probe => {
+  Object.keys(probeConfig).forEach(probe => {
     probes += `
-      <p><a href="probe/${probe}">Probe "${probe}"</a></p>
-      <p><a href="probe/${probe}?debug=true">Debug probe "${probe}"</a></p>`;
+      <li><a href="probe/${probe}">${probe}</a></li>`;
   });
 
   res.send(`<html>
@@ -28,7 +30,9 @@ app.get('/', (req, res) => {
     <p><a href="metrics">Metrics</a></p>
     <p><a href="config">Configuration</a></p>
     <h2>Probes</h2>
+    <ul>
     ${probes}
+    </ul>
   </body>
 </html>`);
 });
@@ -38,18 +42,19 @@ app.get('/', (req, res) => {
  */
 app.get('/probe/:probe', (req, res) => {
   try {
-    options = config.probes[req.params.probe].options;
+    return new Prober(req, res, req.params.probe).run();
   }
   catch {
+    logger.info(`requested probe '${req.params.probe}' not found`);
     return res.status(404).send('Probe not found');
   }
-  return new Prober(req, res, options).run();
 });
 
 /**
  * Return Node.js metrics
  */
 app.get('/metrics', (req, res) => {
+  logger.debug('return /metrics');
   res.set('Content-Type', register.contentType);
   res.end(register.metrics());
 });
@@ -58,17 +63,19 @@ app.get('/metrics', (req, res) => {
  * Return current configuration
  */
 app.get('/config', (req, res) => {
-  if (!config.enableConfigEndpoint === true) {
-    return res.status(403).send('configuration endpoint disabled');
-  }
+  logger.debug('return /config');
   res.send(config);
 });
 
 /**
- * Returns 200 when the service is running
+ * Returns status code 200 when the service is running
  */
 app.get('/-/ready', (req, res) => {
+  logger.debug('return /-/ready');
   res.send('ready');
 });
 
-app.listen(config.serverPort, () => console.log(`postman exporter running on port ${config.serverPort}`));
+app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
+
+// Export for testing purposes
+module.exports = app;
