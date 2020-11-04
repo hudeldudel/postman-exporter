@@ -76,3 +76,6 @@ app.get('/-/ready', (req, res) => {
 });
 
 app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
+
+// Export for testing purposes
+module.exports = app;
