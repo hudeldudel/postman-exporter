@@ -1,4 +1,5 @@
 const config = require('../config/config');
+const probeConfig = require(config.probeConfigFile);
 const newman = require('newman');
 const promClient = require('prom-client');
 const logger = require('../utils/logger');
@@ -11,7 +12,7 @@ class Prober {
     this.req = req;
     this.res = res;
     this.probe = probe;
-    this.options = config.probes[probe].options;
+    this.options = probeConfig[probe].options;
 
     // registry for the current probe
     this.probeRegistry = new promClient.Registry();
@@ -30,9 +31,13 @@ class Prober {
         else {
           logger.debug(`collection run for probe '${this.probe}' completed`);
           if (this.req.query.debug === 'true') {
-            // ToDo: allow to disable debug output as it may contain secrets
-            logger.info(`return /probe/${this.probe} with debug=true`);
-            return this.res.send(summary.run);
+            if (config.enableProbeDebugging) {
+              logger.info(`return /probe/${this.probe} with debug=true`);
+              return this.res.send(summary.run);
+            } else {
+              logger.info(`rejected request to /probe/${this.probe} with debug=true. Probe debugging is disabled`);
+              return this.res.status(403).send('probe debugging disabled');
+            }
           }
 
           /**

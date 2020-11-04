@@ -1,4 +1,5 @@
 const config = require('./config/config');
+const probeConfig = require(config.probeConfigFile);
 const promClient = require('prom-client');
 const express = require('express');
 const logger = require('./utils/logger');
@@ -17,10 +18,9 @@ app.get('/', (req, res) => {
 
   let probes = '';
   
-  Object.keys(config.probes).forEach(probe => {
+  Object.keys(probeConfig).forEach(probe => {
     probes += `
-      <p><a href="probe/${probe}">Probe "${probe}"</a></p>
-      <p><a href="probe/${probe}?debug=true">Debug probe "${probe}"</a></p>`;
+      <li><a href="probe/${probe}">${probe}</a></li>`;
   });
 
   res.send(`<html>
@@ -30,7 +30,9 @@ app.get('/', (req, res) => {
     <p><a href="metrics">Metrics</a></p>
     <p><a href="config">Configuration</a></p>
     <h2>Probes</h2>
+    <ul>
     ${probes}
+    </ul>
   </body>
 </html>`);
 });
@@ -61,16 +63,12 @@ app.get('/metrics', (req, res) => {
  * Return current configuration
  */
 app.get('/config', (req, res) => {
-  if (!config.enableConfigEndpoint === true) {
-    logger.debug('request to /config is forbidden. configuration endpoint disabled');
-    return res.status(403).send('configuration endpoint disabled');
-  }
   logger.debug('return /config');
   res.send(config);
 });
 
 /**
- * Returns 200 when the service is running
+ * Returns status code 200 when the service is running
  */
 app.get('/-/ready', (req, res) => {
   logger.debug('return /-/ready');
