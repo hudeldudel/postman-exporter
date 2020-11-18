@@ -150,7 +150,17 @@ Returns status code 200 when the service is running
   * probe_pm_assertion_failure: assertion failures with iteration, position, request_name, assertion labels
   * Number of summary.run.failures
 
+
+## Run with Docker
+
+* Build
+  * `docker build -t postman-exporter .`
+* Run for tests
+  * `docker run --rm -p 5000:3000 postman-exporter`
+* Sample usage (**some.json** - your collection)
+  * `docker run -d --restart=always -p 3000:3000 -v $(PWD)/some.json:/app/config/example.json postman-exporter`
+
+
 ## Example Grafana Dashboard
 
 tbd
-
