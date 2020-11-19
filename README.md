@@ -156,7 +156,7 @@ Returns status code 200 when the service is running
 * Build
   * `docker build -t postman-exporter .`
 * Run for tests
-  * `docker run --rm -p 5000:3000 postman-exporter`
+  * `docker run --rm -p 3000:3000 postman-exporter`
 * Sample usage (**some.json** - your collection)
   * `docker run -d --restart=always -p 3000:3000 -v $(PWD)/some.json:/app/config/example.json postman-exporter`
 
