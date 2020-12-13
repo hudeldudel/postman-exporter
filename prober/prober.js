@@ -96,6 +96,7 @@ class Prober {
             labelNames: ['iteration', 'position', 'request_name', 'assertion']
           });
           for (const [key, execution] of Object.entries(summary.run.executions)) {
+            if(! execution.assertions) continue;
             for (const [key2, assertion] of Object.entries(execution.assertions)) {
               assertionFailureGauge.set(
                 {
