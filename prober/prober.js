@@ -126,6 +126,7 @@ class Prober {
           }).set(summary.run.failures.length);
 
           logger.info(`return /probe/${this.probe}`);
+          this.res.set('Content-Type', this.probeRegistry.contentType);
           this.res.send(this.probeRegistry.metrics());
         }
       });
