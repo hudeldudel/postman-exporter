@@ -70,7 +70,7 @@ describe('Endpoint tests', () => {
                 .get('/probe/example')
                 .end((err, res) => {
                     res.should.have.status(200);
-                    res.should.be.html;
+                    res.should.be.text;
                     res.text.should.have.string('probe_pm_success');
                     done();
                 })
