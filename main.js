@@ -75,7 +75,8 @@ app.get('/-/ready', (req, res) => {
   res.send('ready');
 });
 
-app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
+const server = app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
+server.timeout = config.serverTimeout;
 
 // Export for testing purposes
 module.exports = app;

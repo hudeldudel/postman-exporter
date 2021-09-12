@@ -81,6 +81,10 @@ Service configuration is available via configuration file [config/config.js](con
 * `POSTMAN_BLACKBOX_EXPORTER_PORT`\
 Network port to bind to.\
 Default: *3000*
+* `POSTMAN_BLACKBOX_EXPORTER_TIMEOUT`\
+Server timeout in milliseconds.\
+Default: *120000*\
+If necessary, think about adjusting the scrape timeout also in Prometheus.
 * `POSTMAN_BLACKBOX_EXPORTER_LOGLEVEL`\
 Loglevel (*debug*|*info*|*warn*|*error*).\
 Default: *info*
