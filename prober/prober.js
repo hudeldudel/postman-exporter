@@ -16,6 +16,9 @@ class Prober {
 
     // registry for the current probe
     this.probeRegistry = new promClient.Registry();
+    if (typeof probeConfig[probe].customLabels === 'object') {
+      this.probeRegistry.setDefaultLabels(probeConfig[probe].customLabels);
+    }
   }
 
   run() {

@@ -57,6 +57,11 @@ module.exports = {
       // https://github.com/postmanlabs/newman#newmanrunoptions-object--callback-function--run-eventemitter
       options: {
           collection: require('./example.json')
+      },
+      // Optional: Set labels that will be added to all probe metrics.
+      customLabels: {
+          example_label: "example_label_value",
+          another_example_label: "another value"
       }
   },
 
