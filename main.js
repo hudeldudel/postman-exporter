@@ -53,10 +53,10 @@ app.get('/probe/:probe', (req, res) => {
 /**
  * Return Node.js metrics
  */
-app.get('/metrics', (req, res) => {
+app.get('/metrics', async (req, res) => {
   logger.debug('return /metrics');
   res.set('Content-Type', register.contentType);
-  res.end(register.metrics());
+  res.end(await register.metrics());
 });
 
 /**

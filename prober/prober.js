@@ -23,7 +23,7 @@ class Prober {
       .on('start', (err, args) => {
         logger.debug(`collection run for probe '${this.probe}' started`);
       })
-      .on('done', (err, summary) => {
+      .on('done', async (err, summary) => {
         if (err || summary.error) {
           logger.error(`collection run for probe '${this.probe}' encountered an error`);
           this.summary = summary;
@@ -127,7 +127,7 @@ class Prober {
 
           logger.info(`return /probe/${this.probe}`);
           this.res.set('Content-Type', this.probeRegistry.contentType);
-          this.res.send(this.probeRegistry.metrics());
+          this.res.send(await this.probeRegistry.metrics());
         }
       });
   }
