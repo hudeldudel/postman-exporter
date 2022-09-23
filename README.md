@@ -135,14 +135,14 @@ Display overview page
 * `GET /probe/:probe[?debug=true]`\
 Run probe and show metrics\
 *Parameters*:\
-`probe`: (required) the probe to run. E. g. /probe/example\
+`probe`: (required) the probe to run. E. g. /probe/example
 *Arguments*:\
 `?debug=true`: (optional) If added, newmans [run summary object](https://github.com/postmanlabs/newman#newmanruncallbackerror-object--summary-object) is returned instead of metrics. Probe debug also needs to be enabled in configuration.
 
 * `GET /htmlreport/:probe`\
 Get HTML report for probe\
 *Parameters*:\
-`probe`: (required) the probe for which to retrieve the HTML report. E. g. /htmlreport/example\
+`probe`: (required) the probe for which to retrieve the HTML report. E. g. /htmlreport/example
 
 * `GET /config`\
 Show active configuration
