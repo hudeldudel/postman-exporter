@@ -21,7 +21,7 @@ app.get('/', (req, res) => {
   
   Object.keys(probeConfig).forEach(probe => {
     if (probeConfig[probe].options.hasOwnProperty('reporter')) {
-      if (probeConfig[probe].options.reporter.hasOwnProperty('html')) {
+      if (probeConfig[probe].options.reporter.hasOwnProperty('htmlextra')) {
         probes += `
           <li><a href="probe/${probe}">${probe}</a> (<a href="htmlreport/${probe}">HTML report</a>)</li>`;
       } else {
@@ -92,7 +92,7 @@ app.get('/-/ready', (req, res) => {
  app.get('/htmlreport/:probe', (req, res) => {
   try {
     logger.debug(`return /htmlreport/'${req.params.probe}'`);
-    let htmlFile = probeConfig[req.params.probe].options.reporter.html.export;
+    let htmlFile = probeConfig[req.params.probe].options.reporter.htmlextra.export;
     res.sendFile(path.join(__dirname, htmlFile));
   }
   catch {
