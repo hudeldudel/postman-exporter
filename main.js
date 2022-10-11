@@ -9,6 +9,7 @@ const register = new promClient.Registry();
 promClient.collectDefaultMetrics({ register });
 
 const app = express();
+const path = require('path');
 
 /**
  * Show index page
@@ -19,8 +20,18 @@ app.get('/', (req, res) => {
   let probes = '';
   
   Object.keys(probeConfig).forEach(probe => {
-    probes += `
-      <li><a href="probe/${probe}">${probe}</a></li>`;
+    if (probeConfig[probe].options.hasOwnProperty('reporter')) {
+      if (probeConfig[probe].options.reporter.hasOwnProperty('htmlextra')) {
+        probes += `
+          <li><a href="probe/${probe}">${probe}</a> (<a href="htmlreport/${probe}">HTML report</a>)</li>`;
+      } else {
+        probes += `
+          <li><a href="probe/${probe}">${probe}</a></li>`;
+      }
+    } else {
+      probes += `
+        <li><a href="probe/${probe}">${probe}</a></li>`;
+    }
   });
 
   res.send(`<html>
@@ -73,6 +84,21 @@ app.get('/config', (req, res) => {
 app.get('/-/ready', (req, res) => {
   logger.debug('return /-/ready');
   res.send('ready');
+});
+
+/**
+ * Returns HTML report if used
+ */
+ app.get('/htmlreport/:probe', (req, res) => {
+  try {
+    logger.debug(`return /htmlreport/'${req.params.probe}'`);
+    let htmlFile = probeConfig[req.params.probe].options.reporter.htmlextra.export;
+    res.sendFile(path.join(__dirname, htmlFile));
+  }
+  catch {
+    logger.info(`requested probe '${req.params.probe}' or html report not found`);
+    return res.status(404).send('HTML report not found');
+  }
 });
 
 const server = app.listen(config.serverPort, () => logger.info(`postman exporter running on port ${config.serverPort}`));
