@@ -12,7 +12,7 @@ The postman exporter aims to be able to carry even complex test procedures. Thes
 
 Prerequisites:
 
-* [Node.js](https://nodejs.org/) >= v10
+* [Node.js](https://nodejs.org/) >= v20
 
 Install: 
 
