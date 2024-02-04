@@ -38,4 +38,4 @@ jobs:
             linux/arm64/v8
             linux/arm/v7
           push: true
-          tags: hudeldudel/postman-exporter-test:latest
+          tags: hudeldudel/postman-exporter:latest
