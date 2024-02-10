@@ -162,14 +162,21 @@ Returns status code 200 when the service is running
 
 ## Run with Docker
 
-* Build
-  * `docker build -t postman-exporter .`
-* Run for tests
-  * `docker run --rm -p 3000:3000 postman-exporter`
-* Sample usage (**some.json** - your collection)
-  * `docker run -d --restart=always -p 3000:3000 -v $(PWD)/some.json:/app/config/example.json postman-exporter`
+* Run with included example
 
+  `docker run --rm -p 3000:3000 ghcr.io/hudeldudel/postman-exporter`
 
-## Example Grafana Dashboard
+* Run with your own configuration
 
-tbd
+  * **collection.json** - your collection
+  * **probes.js** - your probes configuration using collection.json
+  ```
+  docker run \
+    -d \
+    --restart=always \
+    -p 3000:3000 \
+    -v $(PWD)/myconfig/probes.js:/app/config/probes.js \
+    -v $(PWD)/myconfig/collection.json:/app/config/collection.json \
+    ghcr.io/hudeldudel/postman-exporter
+  ``` 
+
