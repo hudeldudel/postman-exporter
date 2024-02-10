@@ -1,4 +1,4 @@
-FROM node:21-alpine 
+FROM node:21-bookworm-slim
 
 RUN mkdir /app && chown -R node:node /app
 
