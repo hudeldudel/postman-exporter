@@ -103,7 +103,13 @@ class Prober {
             help: 'Returns response size (bytes)',
             registers: [this.probeRegistry],
             labelNames: ['iteration', 'position', 'request_name']
-          })
+          });
+          var assertionFailureGauge = new promClient.Gauge({
+            name: NAME_PREFIX + 'executions_assertion_failure',
+            help: 'Returns assertion failures',
+            registers: [this.probeRegistry],
+            labelNames: ['iteration', 'position', 'request_name', 'assertion', 'skipped']
+          });
 
           for (const [key, execution] of Object.entries(summary.run.executions)) {
             // response time
@@ -130,12 +136,7 @@ class Prober {
 
             // assertions
             if (execution.assertions) {
-              var assertionFailureGauge = new promClient.Gauge({
-                name: NAME_PREFIX + 'executions_assertion_failure',
-                help: 'Returns assertion failures',
-                registers: [this.probeRegistry],
-                labelNames: ['iteration', 'position', 'request_name', 'assertion', 'skipped']
-              });
+              
               for (const [key2, assertion] of Object.entries(execution.assertions)) {
                 assertionFailureGauge.set(
                   {
