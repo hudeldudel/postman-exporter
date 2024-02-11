@@ -92,15 +92,23 @@ class Prober {
           }
 
           // executions
+          var responseTimeGauge = new promClient.Gauge({
+            name: NAME_PREFIX + 'executions_response_seconds',
+            help: 'Returns response time (seconds)',
+            registers: [this.probeRegistry],
+            labelNames: ['iteration', 'position', 'request_name']
+          });
+          var responseSizeGauge = new promClient.Gauge({
+            name: NAME_PREFIX + 'executions_response_bytes',
+            help: 'Returns response size (bytes)',
+            registers: [this.probeRegistry],
+            labelNames: ['iteration', 'position', 'request_name']
+          })
+
           for (const [key, execution] of Object.entries(summary.run.executions)) {
             // response time
             if (execution.response.responseTime) {
-              var responseTimeGauge = new promClient.Gauge({
-                name: NAME_PREFIX + 'executions_response_seconds',
-                help: 'Returns response time (seconds)',
-                registers: [this.probeRegistry],
-                labelNames: ['iteration', 'position', 'request_name']
-              }).set(
+              responseTimeGauge.set(
                 {
                   'iteration': execution.cursor.iteration,
                   'position': execution.cursor.position,
@@ -111,12 +119,7 @@ class Prober {
 
             // response size
             if (execution.response.responseSize) {
-              var responseTimeGauge = new promClient.Gauge({
-                name: NAME_PREFIX + 'executions_response_bytes',
-                help: 'Returns response size (bytes)',
-                registers: [this.probeRegistry],
-                labelNames: ['iteration', 'position', 'request_name']
-              }).set(
+              responseSizeGauge.set(
                 {
                   'iteration': execution.cursor.iteration,
                   'position': execution.cursor.position,
@@ -149,12 +152,10 @@ class Prober {
           }
           // ToDo:
           // loop over sumary.run.executions and add with labels?
-          // * Request name
-          // * HTTP Method
+          // * Request tpye
+          // * HTTP method
           // * URL (Creates lots of labels!, maybe without query parameters and otherwise shortened)
           // * Response code
-          // * Response data received
-          // * Response time
 
           // failures
           new promClient.Gauge({
