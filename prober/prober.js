@@ -92,25 +92,60 @@ class Prober {
           }
 
           // executions
-          var assertionFailureGauge = new promClient.Gauge({
-            name: NAME_PREFIX + 'assertion_failure',
-            help: 'Returns assertion failures',
-            registers: [this.probeRegistry],
-            labelNames: ['iteration', 'position', 'request_name', 'assertion']
-          });
           for (const [key, execution] of Object.entries(summary.run.executions)) {
-            if(! execution.assertions) continue;
-            for (const [key2, assertion] of Object.entries(execution.assertions)) {
-              assertionFailureGauge.set(
+            // response time
+            if (execution.response.responseTime) {
+              var responseTimeGauge = new promClient.Gauge({
+                name: NAME_PREFIX + 'executions_response_seconds',
+                help: 'Returns response time (seconds)',
+                registers: [this.probeRegistry],
+                labelNames: ['iteration', 'position', 'request_name']
+              }).set(
                 {
                   'iteration': execution.cursor.iteration,
                   'position': execution.cursor.position,
-                  'request_name': execution.item.name,
-                  'assertion': assertion.assertion
-                }, 
-                assertion.error !== undefined ? 1 : 0
-              );
+                  'request_name': execution.item.name
+                },
+                execution.response.responseTime / 1000);
             }
+
+            // response size
+            if (execution.response.responseSize) {
+              var responseTimeGauge = new promClient.Gauge({
+                name: NAME_PREFIX + 'executions_response_bytes',
+                help: 'Returns response size (bytes)',
+                registers: [this.probeRegistry],
+                labelNames: ['iteration', 'position', 'request_name']
+              }).set(
+                {
+                  'iteration': execution.cursor.iteration,
+                  'position': execution.cursor.position,
+                  'request_name': execution.item.name
+                },
+                execution.response.responseSize);
+            }
+
+            // assertions
+            if (execution.assertions) {
+              var assertionFailureGauge = new promClient.Gauge({
+                name: NAME_PREFIX + 'executions_assertion_failure',
+                help: 'Returns assertion failures',
+                registers: [this.probeRegistry],
+                labelNames: ['iteration', 'position', 'request_name', 'assertion', 'skipped']
+              });
+              for (const [key2, assertion] of Object.entries(execution.assertions)) {
+                assertionFailureGauge.set(
+                  {
+                    'iteration': execution.cursor.iteration,
+                    'position': execution.cursor.position,
+                    'request_name': execution.item.name,
+                    'assertion': assertion.assertion,
+                    'skipped': assertion.skipped
+                  }, 
+                  assertion.error !== undefined ? 1 : 0
+                );
+              }
+            };
           }
           // ToDo:
           // loop over sumary.run.executions and add with labels?
