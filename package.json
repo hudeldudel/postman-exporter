@@ -1,6 +1,6 @@
 {
   "name": "postman-exporter",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "Postman Exporter",
   "author": "Sebastian Ebling",
   "license": "Apache-2.0",
