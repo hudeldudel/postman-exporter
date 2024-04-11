@@ -16,7 +16,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "newman": "^6.1.2",
-    "npm": "^10.5.0",
+    "npm": "^10.5.2",
     "prom-client": "^15.1.1",
     "winston": "^3.13.0"
   },
