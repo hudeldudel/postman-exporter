@@ -112,26 +112,30 @@ class Prober {
           });
 
           for (const [key, execution] of Object.entries(summary.run.executions)) {
-            // response time
-            if (execution.response.responseTime !== undefined) {
-              responseTimeGauge.set(
-                {
-                  'iteration': execution.cursor.iteration,
-                  'position': execution.cursor.position,
-                  'request_name': execution.item.name
-                },
-                execution.response.responseTime / 1000);
-            }
+            
+            if (execution.response) {
+              // response time
+              if (execution.response.responseTime) {
+                responseTimeGauge.set(
+                  {
+                    'iteration': execution.cursor.iteration,
+                    'position': execution.cursor.position,
+                    'request_name': execution.item.name
+                  },
+                  execution.response.responseTime / 1000);
+              }
 
-            // response size
-            if (execution.response.responseSize !== undefined) {
-              responseSizeGauge.set(
-                {
-                  'iteration': execution.cursor.iteration,
-                  'position': execution.cursor.position,
-                  'request_name': execution.item.name
-                },
-                execution.response.responseSize);
+              // response size
+              if (execution.response.responseSize) {
+                responseSizeGauge.set(
+                  {
+                    'iteration': execution.cursor.iteration,
+                    'position': execution.cursor.position,
+                    'request_name': execution.item.name
+                  },
+                  execution.response.responseSize);
+              }
+
             }
 
             // assertions
