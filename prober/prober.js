@@ -113,7 +113,7 @@ class Prober {
 
           for (const [key, execution] of Object.entries(summary.run.executions)) {
             // response time
-            if (execution.response.responseTime) {
+            if (execution.response.responseTime !== undefined) {
               responseTimeGauge.set(
                 {
                   'iteration': execution.cursor.iteration,
@@ -124,7 +124,7 @@ class Prober {
             }
 
             // response size
-            if (execution.response.responseSize) {
+            if (execution.response.responseSize !== undefined) {
               responseSizeGauge.set(
                 {
                   'iteration': execution.cursor.iteration,
