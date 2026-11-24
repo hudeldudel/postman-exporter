@@ -27,11 +27,13 @@ class Prober {
         logger.debug(`collection run for probe '${this.probe}' started`);
       })
       .on('done', async (err, summary) => {
-        if (err || summary.error) {
+        if (err) {
           logger.error(`collection run for probe '${this.probe}' encountered an error`);
-          this.summary = summary;
-        }
-        else {
+          return this.res.status(500).send(`collection run for probe '${this.probe}' encountered an error`);
+        } else if (summary.error) {
+          logger.error(`collection run for probe '${this.probe}' encountered an error: ${summary.error}`);
+          return this.res.status(500).send(`collection run for probe '${this.probe}' encountered an error: ${summary.error}`);
+        } else {
           logger.debug(`collection run for probe '${this.probe}' completed`);
           if (this.req.query.debug === 'true') {
             if (config.enableProbeDebugging) {
